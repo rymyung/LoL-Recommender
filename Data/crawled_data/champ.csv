@@ -1,0 +1,142 @@
+champId,champName,tags,position1,position2
+266,Aatrox,"['Fighter', 'Tank']",top,
+103,Ahri,"['Mage', 'Assassin']",middle,
+84,Akali,['Assassin'],top, middle
+12,Alistar,"['Tank', 'Support']",support,
+32,Amumu,"['Tank', 'Mage']",jungle,
+34,Anivia,"['Mage', 'Support']",middle,
+1,Annie,['Mage'],support,middle
+22,Ashe,"['Marksman', 'Support']",adc,
+136,Aurelion Sol,"['Mage', 'Fighter']",middle,
+268,Azir,"['Mage', 'Marksman']",middle,
+432,Bard,"['Support', 'Mage']",support,
+53,Blitzcrank,"['Tank', 'Fighter']",support,
+63,Brand,['Mage'],support,middle
+201,Braum,"['Support', 'Tank']",support,
+51,Caitlyn,['Marksman'],adc,
+164,Camille,"['Fighter', 'Tank']",top, jungle
+69,Cassiopeia,['Mage'],middle,
+31,Cho'Gath,"['Tank', 'Mage']",top,
+42,Corki,['Marksman'],middle,
+122,Darius,"['Fighter', 'Tank']",top,
+131,Diana,"['Fighter', 'Mage']",middle,
+36,Dr. Mundo,"['Fighter', 'Tank']",top, jungle
+119,Draven,['Marksman'],adc,
+245,Ekko,"['Assassin', 'Fighter']",middle,top
+60,Elise,"['Mage', 'Fighter']",jungle,
+28,Evelynn,"['Assassin', 'Mage']",jungle,
+81,Ezreal,"['Marksman', 'Mage']",adc,
+9,Fiddlesticks,"['Mage', 'Support']",support,jungle
+114,Fiora,"['Fighter', 'Assassin']",top,
+105,Fizz,"['Assassin', 'Fighter']",middle,
+3,Galio,"['Tank', 'Mage']",middle,
+41,Gangplank,['Fighter'],top,
+86,Garen,"['Fighter', 'Tank']",top,
+150,Gnar,"['Fighter', 'Tank']",top,
+79,Gragas,"['Fighter', 'Mage']",jungle,
+104,Graves,['Marksman'],jungle,
+120,Hecarim,"['Fighter', 'Tank']",jungle,
+74,Heimerdinger,"['Mage', 'Support']",top, middle
+420,Illaoi,"['Fighter', 'Tank']",top,
+39,Irelia,"['Fighter', 'Assassin']",top, middle
+427,Ivern,"['Support', 'Mage']",jungle,
+40,Janna,"['Support', 'Mage']",support,
+59,Jarvan IV,"['Tank', 'Fighter']",jungle,
+24,Jax,"['Fighter', 'Assassin']",top, jungle
+126,Jayce,"['Fighter', 'Marksman']",top, middle
+202,Jhin,"['Marksman', 'Assassin']",adc,
+222,Jinx,['Marksman'],adc,
+145,Kai'Sa,['Marksman'],adc,
+429,Kalista,['Marksman'],adc,
+43,Karma,"['Mage', 'Support']",support, middle
+30,Karthus,['Mage'],middle,
+38,Kassadin,"['Assassin', 'Mage']",middle,
+55,Katarina,"['Assassin', 'Mage']",middle,
+10,Kayle,"['Fighter', 'Support']",top, middle
+141,Kayn,"['Tank', 'Fighter', 'Assassin']",jungle,
+85,Kennen,"['Mage', 'Marksman']",top,
+121,Kha'Zix,"['Assassin', 'Fighter']",jungle,
+203,Kindred,['Marksman'],jungle,
+240,Kled,"['Fighter', 'Tank']",top,
+96,Kog'Maw,"['Marksman', 'Mage']",adc,
+7,LeBlanc,"['Assassin', 'Mage']",middle,
+64,Lee Sin,"['Fighter', 'Assassin']",jungle,
+89,Leona,"['Tank', 'Support']",support,
+127,Lissandra,['Mage'],middle,top
+236,Lucian,['Marksman'],adc,middle
+117,Lulu,"['Support', 'Mage']",support,middle
+99,Lux,"['Mage', 'Support']",middle, support
+54,Malphite,"['Tank', 'Fighter']",top,support
+90,Malzahar,"['Mage', 'Assassin']",middle,
+57,Maokai,"['Tank', 'Mage']",top,
+11,Master Yi,"['Assassin', 'Fighter']",jungle,
+21,Miss Fortune,['Marksman'],adc, support
+82,Mordekaiser,['Fighter'],top,
+25,Morgana,"['Mage', 'Support']",support,
+267,Nami,"['Support', 'Mage']",support,
+75,Nasus,"['Fighter', 'Tank']",top,
+111,Nautilus,"['Tank', 'Fighter']",support,
+76,Nidalee,"['Assassin', 'Fighter']",jungle,
+56,Nocturne,"['Assassin', 'Fighter']",jungle, middle
+20,Nunu,"['Support', 'Fighter']",jungle,top
+2,Olaf,"['Fighter', 'Tank']",jungle,top
+61,Orianna,"['Mage', 'Support']",middle,
+516,Ornn,"['Tank', 'Fighter']",top,
+80,Pantheon,"['Fighter', 'Assassin']",top, jungle
+78,Poppy,"['Tank', 'Fighter']",top,
+555,Pyke,"['Support', 'Assassin']",support, jungle
+133,Quinn,"['Marksman', 'Fighter']",top, middle
+497,Rakan,"['Support', 'Mage']",support,
+33,Rammus,"['Tank', 'Fighter']",jungle,
+421,Rek'Sai,['Fighter'],jungle,
+58,Renekton,"['Fighter', 'Tank']",top,
+107,Rengar,"['Assassin', 'Fighter']",jungle,top
+92,Riven,"['Fighter', 'Assassin']",top, jungle
+68,Rumble,"['Fighter', 'Mage']",top,
+13,Ryze,"['Mage', 'Fighter']",middle,top
+113,Sejuani,"['Tank', 'Fighter']",jungle,
+35,Shaco,['Assassin'],jungle,
+98,Shen,"['Tank', 'Melee']",top, support
+102,Shyvana,"['Fighter', 'Tank']",jungle,
+27,Singed,"['Tank', 'Fighter']",top,
+14,Sion,"['Tank', 'Fighter']",top, middle
+15,Sivir,['Marksman'],adc,
+72,Skarner,"['Fighter', 'Tank']",jungle,
+37,Sona,"['Support', 'Mage']",support,
+16,Soraka,"['Support', 'Mage']",support,
+50,Swain,"['Mage', 'Fighter']",top, middle
+134,Syndra,"['Mage', 'Support']",middle,
+223,Tahm Kench,"['Support', 'Tank']",support,
+163,Taliyah,"['Mage', 'Support']",middle,
+91,Talon,"['Assassin', 'Fighter']",middle,
+44,Taric,"['Support', 'Fighter']",support,
+17,Teemo,"['Marksman', 'Assassin']",top,support
+412,Thresh,"['Support', 'Fighter']",support,
+18,Tristana,"['Marksman', 'Assassin']",adc,
+48,Trundle,"['Fighter', 'Tank']",jungle,top
+23,Tryndamere,"['Fighter', 'Assassin']",top,
+4,Twisted Fate,['Mage'],middle,
+29,Twitch,"['Marksman', 'Assassin']",adc,jungle
+77,Udyr,"['Fighter', 'Tank']",jungle,
+6,Urgot,"['Marksman', 'Fighter']",top,
+110,Varus,"['Marksman', 'Mage']",adc,
+67,Vayne,"['Marksman', 'Assassin']",adc,
+45,Veigar,['Mage'],middle, support
+161,Vel'Koz,['Mage'],middle, support
+254,Vi,"['Fighter', 'Assassin']",jungle,
+112,Viktor,['Mage'],middle,
+8,Vladimir,"['Mage', 'Tank']",middle,top
+106,Volibear,"['Fighter', 'Tank']",top,
+19,Warwick,"['Fighter', 'Tank']",jungle,
+62,Wukong,"['Fighter', 'Tank']",top, jungle
+498,Xayah,['Marksman'],adc,
+101,Xerath,"['Mage', 'Assassin']",middle, support
+5,Xin Zhao,"['Fighter', 'Assassin']",jungle,
+157,Yasuo,"['Fighter', 'Assassin']",middle,top
+83,Yorick,"['Fighter', 'Tank']",top,
+154,Zac,"['Tank', 'Fighter']",jungle,
+238,Zed,"['Assassin', 'Fighter']",middle,
+115,Ziggs,['Mage'],middle,
+26,Zilean,"['Support', 'Mage']",support,middle
+142,Zoe,"['Mage', 'Support']",middle,
+143,Zyra,"['Mage', 'Support']",support,
