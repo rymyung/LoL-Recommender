@@ -10,50 +10,48 @@ import time
 import pandas as pd
 
 # Set API Key
-'''
-20 requests / 1 second
-100 requests / 2 minutes
-'''
-api_key = 'RGAPI-de243245-5655-4bba-bfd9-5ef9f96d1318' # Need to chage everyday
-
+api_key = '' # Need to chage everyday
 
 # Get Summoner's Names
-challenger_url = 'https://kr.api.riotgames.com/lol/league/v3/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=' + api_key
+challenger_url = "https://kr.api.riotgames.com/lol/league/v3/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=" + api_key
 challenger_r = requests.get(challenger_url)
 challenger_data = json.loads(challenger_r.text)
+
 
 name_list = []
 for entry in challenger_data['entries'] :
     name_list.append(entry['playerOrTeamName'])
     
-
-master_url = 'https://kr.api.riotgames.com/lol/league/v3/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=' + api_key
+master_url = "https://kr.api.riotgames.com/lol/league/v3/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=" + api_key
 master_r = requests.get(master_url)
 master_data = json.loads(master_r.text)
 
 for entry in master_data['entries'] :
     name_list.append(entry['playerOrTeamName'])   
 
-name_list = name_list[:200]
+
 # Get Account Id
+'''
+2,000 requests / 1 minute
+'''
 account_list = []
 k = 1
 for name in name_list :
-    account_url = 'https://kr.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + name.replace(' ', '%20') + '?api_key=' + api_key
-    account_r = requests.get(account_url)
-    account_data = json.loads(account_r.text)
     
-    try :
-        account_list.append(account_data['accountId'])
-    except :
-        account_list.append('error')
+    while True :
+        account_url = 'https://kr.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + name.replace(' ', '%20') + '?api_key=' + api_key
+        account_r = requests.get(account_url)
+        account_data = json.loads(account_r.text)
         
-    if k % 20 == 0 :
-        time.sleep(1)
+        try :
+            account_list.append(account_data['accountId'])
+            break
         
+        except :
+            time.sleep(60)
+            
     if k % 100 == 0 :
         print('{} of {} is done.'.format(k, len(name_list)))
-        time.sleep(120)
         
     k += 1
     

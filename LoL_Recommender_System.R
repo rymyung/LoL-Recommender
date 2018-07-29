@@ -3,6 +3,9 @@
 ### Setting up Environment
 #####################################################################################
 
+# Set working directory
+setwd("C:/Users/Ro_Laptop/Dropbox/Public/°øºÎ/github/LoL-Recommender")
+
 # Load libraries
 pkgs <- c("dplyr", "tidyr", "stringr", "igraph", 'visNetwork', 
           "colorspace", "DescTools", "arules", "ggplot2", "RColorBrewer")
@@ -17,32 +20,32 @@ options(warn = -1)
 #####################################################################################
 
 # Load user data
-user <- read.csv("crawled_data/user_position.csv", stringsAsFactors = F)
+user <- read.csv("Data/crawled_data/user_position.csv", stringsAsFactors = F)
 
 # Load champ data
-champ <- read.csv("crawled_data/champ.csv", stringsAsFactors = F)
+champ <- read.csv("Data/crawled_data/champ.csv", stringsAsFactors = F)
 
 # Load user's most champ data
-most <- read.csv("crawled_data/most7.csv", stringsAsFactors = F)
+most <- read.csv("Data/crawled_data/most7.csv", stringsAsFactors = F)
 
 # Load user same side synergy data
-user_mt <- read.csv("user_edges/user_match.csv", stringsAsFactors = F)
+user_mt <- read.csv("Data/user_edges/user_match.csv", stringsAsFactors = F)
 
 # Load champ same side synergy data
-champ_mt <- read.csv("champ_edges/champ_match.csv", stringsAsFactors = F)
+champ_mt <- read.csv("Data/champ_edges/champ_match.csv", stringsAsFactors = F)
 
 # Load champ opposite side synergy data
-champ_re <- read.csv("champ_edges/champ_relative.csv", stringsAsFactors = F)
+champ_re <- read.csv("Data/champ_edges/champ_relative.csv", stringsAsFactors = F)
 
 # Load champ position synergy data
-champ_top <- read.csv('champ_position_edges/champ_top_relative.csv', stringsAsFactors = F)
-champ_jungle <- read.csv('champ_position_edges/champ_jungle_relative.csv', stringsAsFactors = F)
-champ_middle <- read.csv('champ_position_edges/champ_middle_relative.csv', stringsAsFactors = F)
-champ_adc <- read.csv('champ_position_edges/champ_adc_relative.csv', stringsAsFactors = F)
-champ_support <- read.csv('champ_position_edges/champ_support_relative.csv', stringsAsFactors = F)
+champ_top <- read.csv('Data/champ_position_edges/champ_top_relative.csv', stringsAsFactors = F)
+champ_jungle <- read.csv('Data/champ_position_edges/champ_jungle_relative.csv', stringsAsFactors = F)
+champ_middle <- read.csv('Data/champ_position_edges/champ_middle_relative.csv', stringsAsFactors = F)
+champ_adc <- read.csv('Data/champ_position_edges/champ_adc_relative.csv', stringsAsFactors = F)
+champ_support <- read.csv('Data/champ_position_edges/champ_support_relative.csv', stringsAsFactors = F)
 
 # Load game record data
-game  <- read.csv("crawled_data/win_data.csv", stringsAsFactors = F) ; head(game)
+game  <- read.csv("Data/crawled_data/win_data.csv", stringsAsFactors = F) ; head(game)
 
 
 #####################################################################################

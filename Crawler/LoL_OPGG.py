@@ -10,11 +10,12 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from selenium import webdriver
+import time
 
 def getUserInfo(page_num) :
     
     ranking_list = []
-    team_list = []
+    #team_list = []
     name_list = []
     tier_list = []
     LP_list = []
@@ -36,7 +37,7 @@ def getUserInfo(page_num) :
             
             for i in range(len(top5)) :
                 ranking = top5[i].find_all('div', attrs = {'class' : 'ranking-highest__rank'})[0].text
-                team = top5[i].find_all('div', attrs = {'class' : 'ranking-highest__team'})[0].text.replace('\t', '').replace('\n', '')
+                #team = top5[i].find_all('div', attrs = {'class' : 'ranking-highest__team'})[0].text.replace('\t', '').replace('\n', '')
                 name = top5[i].find_all('a', attrs = {'class' : 'ranking-highest__name'})[0].text
                 
                 top5_detail = top5[i].find_all('div', attrs = {'class' : 'ranking-highest__tierrank'})[0]
@@ -49,7 +50,7 @@ def getUserInfo(page_num) :
                 winratio = top5[i].find('span', attrs = {'class' : 'winratio__text'}).text
                 
                 ranking_list.append(ranking)
-                team_list.append(team)
+                #team_list.append(team)
                 name_list.append(name)
                 tier_list.append(tier)
                 LP_list.append(LP)
@@ -67,7 +68,7 @@ def getUserInfo(page_num) :
             tier = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--tier'}).text.replace('\t', '').replace('\n', '')
             LP = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--lp'}).text.replace('\t', '').replace('\n', '').replace(',', '').replace('LP', '').strip()
             level = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--level'}).text.replace('\t', '').replace('\n', '')
-            team = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--team'}).text.replace('\t', '').replace('\n', '')
+            #team = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--team'}).text.replace('\t', '').replace('\n', '')
             
             winratios = users[i].find('td', attrs = {'class' : 'ranking-table__cell ranking-table__cell--winratio'})
             win = winratios.find('div', attrs = {'class' : 'winratio-graph__text winratio-graph__text--left'}).text
@@ -75,7 +76,7 @@ def getUserInfo(page_num) :
             winratio = winratios.find('span', attrs = {'class' : 'winratio__text'}).text
             
             ranking_list.append(ranking)
-            team_list.append(team)
+            #team_list.append(team)
             name_list.append(name)
             tier_list.append(tier)
             LP_list.append(LP)
@@ -86,10 +87,10 @@ def getUserInfo(page_num) :
             
         print("{} of {} are done.".format(p+1, page_num))
     
-    user_info = pd.DataFrame(columns = ['name', 'ranking', 'team', 'tier', 'LP', 'level', 'win', 'lose', 'winratio'])
+    user_info = pd.DataFrame(columns = ['name', 'ranking', 'tier', 'LP', 'level', 'win', 'lose', 'winratio'])
     user_info['name'] = name_list
     user_info['ranking'] = ranking_list
-    user_info['team'] = team_list
+    #user_info['team'] = team_list
     user_info['tier'] = tier_list
     user_info['LP'] = LP_list
     user_info['level'] = level_list
@@ -114,7 +115,7 @@ def getMost7(user_df) :
     
     for j in range(len(user_df)) :
         
-        names = user_df['summonerName'][j].replace(' ', '')
+        names = user_df['name'][j].replace(' ', '')
         url = 'http://www.op.gg/summoner/userName=' + names
         
         response = requests.get(url)
@@ -169,7 +170,7 @@ def getMost7(user_df) :
             winratio_list.append(winratio)
             play_num_list.append(play_num)
         
-        if j+1 % 10 == 0 :
+        if (j+1) % 10 == 0 :
             print('{} of {} is done.'.format(j+1, len(user_df)))
         
     most7 = pd.DataFrame(columns = ['name', 'champ', 'cs', 'kda', 'kill', 'death', 'assist', 'winratio', 'play'])
@@ -210,7 +211,7 @@ def getGameRecord(user_df) :
             url = 'http://www.op.gg/summoner/userName=' + names
             
             
-            driver = webdriver.Chrome('C:/Users/\Ro_PC/Dropbox/Public/ETC/webdriver/chromedriver.exe')
+            driver = webdriver.Chrome('C:/Users/Ro_Laptop/Dropbox/Public/ETC/webdriver/chromedriver.exe')
             driver.get(url)
             
             # Click Solo Rank
@@ -248,16 +249,18 @@ def getGameRecord(user_df) :
                 
                 kill_info = games[k].find_all('span', attrs = {'class' : 'Kill'})
                 kill = kill_info[0].text
+                
                 if len(kill_info) > 1 :
                     multikill = kill_info[1].text
                 else :
                     multikill = ""
+                    
                 death = games[k].find('span', attrs = {'class' : 'Death'}).text
                 assist = games[k].find('span', attrs = {'class' : 'Assist'}).text
                 kda = games[k].find('span', attrs = {'class' : 'KDARatio'}).text
                 
                 gameCS = games[k].find('div', attrs = {'class' : 'CS'}).text.replace('\n', '').replace('\t', '').replace('(', '').replace(')', '').split(' ')[1]
-                gmaeckrate = games[k].find('div', attrs = {'class' : 'CKRate tip'}).text.replace('\n', '').replace('\t', '').split(' ')[1]
+                gameckrate = games[k].find('div', attrs = {'class' : 'CKRate tip'}).text.replace('\n', '').replace('\t', '').split(' ')[1]
                 gameMMR = games[k].find('div', attrs = {'class' : 'MMR'}).text.split(' ')[2]
                 
                 teams = games[k].find_all('div', attrs = {'class' : 'Team'})
@@ -280,7 +283,7 @@ def getGameRecord(user_df) :
                     champs_list.append(champs[i].text.split('\n')[1])
                     
                 name_list.append(names)
-                play_champs_list.append(team_check)
+                #play_champs_list.append(team_check)
                 type_list.append(gametype)
                 result_list.append(gameresult)
                 length_list.append(gamelength)
@@ -290,7 +293,7 @@ def getGameRecord(user_df) :
                 kda_list.append(kda)
                 multi_list.append(multikill)
                 cs_list.append(gameCS)
-                ckrate_list.append(gmaeckrate)
+                ckrate_list.append(gameckrate)
                 mmr_list.append(gameMMR)
                 nick_list.append(nicknames_list)
                 champs_all_list.append(champs_list)
@@ -323,12 +326,17 @@ def getGameRecord(user_df) :
     return game_df
 
 def main() :
-    user_info = getUserInfo(2)
-    user_info.to_csv("user_info.csv", header = True, encoding = 'cp949', index = False)
+    user_info = getUserInfo(10)
+    user_info.to_csv("C:/Users/rymyu/Dropbox/Public/공부/github/LoL-Recommender/Data/crawled_data_opgg/user.csv", header = True, encoding = 'cp949', index = False)
     
     most7 = getMost7(user_info)
-    most7.to_csv('most7.csv', header = True, encoding = 'cp949', index = False)
+    most7.to_csv('C:/Users/rymyu/Dropbox/Public/공부/github/LoL-Recommender/Data/crawled_data_opgg/most7.csv', header = True, encoding = 'cp949', index = False)
     
     
     game_df = getGameRecord(user_info)
-    game_df.to_csv("game_record.csv", header = True, encoding = 'cp949', index = False)
+    game_df.to_csv("C:/Users/rymyu/Dropbox/Public/공부/github/LoL-Recommender/Data/crawled_data_opgg/game_record.csv", header = True, encoding = 'cp949', index = False)
+
+
+if __name__ == "__main__" :
+    main()
+    
