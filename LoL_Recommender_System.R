@@ -1,10 +1,16 @@
 
 #####################################################################################
+### Project     : LoL Recommender System
+### Script      : LoL_Recommender_Sysyem.R
+### Description : Integration of all Script
+#####################################################################################
+
+#####################################################################################
 ### Setting up Environment
 #####################################################################################
 
 # Set working directory
-setwd("C:/Users/Ro_Laptop/Dropbox/Public/°øºÎ/github/LoL-Recommender")
+setwd("C:/Users/Ro_Laptop/Dropbox/Public/????/github/LoL-Recommender")
 
 # Load libraries
 pkgs <- c("dplyr", "tidyr", "stringr", "igraph", 'visNetwork', 
