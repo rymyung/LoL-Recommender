@@ -10,7 +10,7 @@ import time
 import pandas as pd
 
 # Set API Key
-api_key = '' # Need to chage everyday
+api_key = 'RGAPI-4806a25d-e22d-4d15-ab9d-9156c9984c7a' # Need to chage everyday
 
 # Get Summoner's Names
 challenger_url = "https://kr.api.riotgames.com/lol/league/v3/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=" + api_key
@@ -36,7 +36,9 @@ for entry in master_data['entries'] :
 '''
 account_list = []
 k = 1
-for name in name_list :
+
+time.sleep(600)
+for name in name_list[500:600] :
     
     while True :
         account_url = 'https://kr.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + name.replace(' ', '%20') + '?api_key=' + api_key
@@ -48,9 +50,10 @@ for name in name_list :
             break
         
         except :
+            print("error")
             time.sleep(60)
             
-    if k % 100 == 0 :
+    if k % 10 == 0 :
         print('{} of {} is done.'.format(k, len(name_list)))
         
     k += 1
