@@ -191,10 +191,11 @@ def getMost7(user_df) :
 def getGameRecord(user_df) :
     
     name_list = []
-    play_champs_list = []
+    #play_champs_list = []
     type_list = []
     result_list = []
     length_list = []
+    time_list = []
     kill_list = []
     death_list = []
     assist_list = []
@@ -203,8 +204,12 @@ def getGameRecord(user_df) :
     cs_list = []
     ckrate_list = []
     mmr_list = []
-    nick_list = []
-    champs_all_list = []
+    mynick_list = []
+    mychamps_all_list = []
+    oppnick_list = []
+    oppchamps_all_list = []
+    
+    
     for j in range(len(user_df)) :
         try :
             names = user_df['name'][j].replace(' ', '')
@@ -234,7 +239,7 @@ def getGameRecord(user_df) :
                 check = contents[-1].text.split('\n')
                 
                 page += 1
-                if check[1] == "한달 전" :
+                if check[1] == "4달 전" :
                     break
                 
             html_source = driver.page_source
@@ -246,6 +251,7 @@ def getGameRecord(user_df) :
                 gametype = games[k].find('div', attrs = {'class' : 'GameType'}).text.replace('\n', '').replace('\t', '')
                 gameresult = games[k].find('div', attrs = {'class' : 'GameResult'}).text.replace('\n', '').replace('\t', '')
                 gamelength = games[k].find('div', attrs = {'class' : 'GameLength'}).text
+                gameTime = str(games[k].find('div', attrs = {'class' : 'TimeStamp'})).split("title")[1].split("\"")[1]
                 
                 kill_info = games[k].find_all('span', attrs = {'class' : 'Kill'})
                 kill = kill_info[0].text
@@ -267,26 +273,40 @@ def getGameRecord(user_df) :
                 
                 try :
                     team_check = teams[0].find('div', attrs = {'class' : 'Summoner Requester'}).find('div', attrs = {'class' : 'SummonerName'}).text.replace('\n', '')
-                    team = teams[0]
+                    myteam = teams[0]
+                    oppteam = teams[1]
                 except :
                     team_check = teams[1].find('div', attrs = {'class' : 'Summoner Requester'}).find('div', attrs = {'class' : 'SummonerName'}).text.replace('\n', '')
-                    team = teams[1]
+                    myteam = teams[1]
+                    oppteam = teams[0]
                     
-                nicknames_list = []
-                nicknames = team.find_all('div', attrs = {'class' : 'SummonerName'})
-                for i in range(len(nicknames)) :
-                    nicknames_list.append(nicknames[i].text.replace('\n', ''))
+                mynicknames_list = []
+                mynicknames = myteam.find_all('div', attrs = {'class' : 'SummonerName'})
+                for i in range(len(mynicknames)) :
+                    mynicknames_list.append(mynicknames[i].text.replace('\n', ''))
                 
-                champs_list = []
-                champs = team.find_all('div', attrs = {'class' : 'ChampionImage'})
-                for i in range(len(champs)) :
-                    champs_list.append(champs[i].text.split('\n')[1])
+                mychamps_list = []
+                mychamps = myteam.find_all('div', attrs = {'class' : 'ChampionImage'})
+                for i in range(len(mychamps)) :
+                    mychamps_list.append(mychamps[i].text.split('\n')[1])
+                    
+                oppnicknames_list = []
+                oppnicknames = oppteam.find_all('div', attrs = {'class' : 'SummonerName'})
+                for i in range(len(oppnicknames)) :
+                    oppnicknames_list.append(oppnicknames[i].text.replace('\n', ''))
+                
+                oppchamps_list = []
+                oppchamps = oppteam.find_all('div', attrs = {'class' : 'ChampionImage'})
+                for i in range(len(oppchamps)) :
+                    oppchamps_list.append(oppchamps[i].text.split('\n')[1])
+                    
                     
                 name_list.append(names)
                 #play_champs_list.append(team_check)
                 type_list.append(gametype)
                 result_list.append(gameresult)
                 length_list.append(gamelength)
+                time_list.append(gameTime)
                 kill_list.append(kill)
                 death_list.append(death)
                 assist_list.append(assist)
@@ -295,23 +315,26 @@ def getGameRecord(user_df) :
                 cs_list.append(gameCS)
                 ckrate_list.append(gameckrate)
                 mmr_list.append(gameMMR)
-                nick_list.append(nicknames_list)
-                champs_all_list.append(champs_list)
+                mynick_list.append(mynicknames_list)
+                mychamps_all_list.append(mychamps_list)
+                oppnick_list.append(oppnicknames_list)
+                oppchamps_all_list.append(oppchamps_list)
                 
         except : 
             continue
     
-        driver.close()
+            driver.close()
         
-        if j+1 % 10 == 0 :
-            print("{} of {} are done.".format(j+1, len(user_df)))
+        if (j+1) % 10 == 0 :
+            print("{} of {} are done.".format((j+1), len(user_df)))
     
-    game_df = pd.DataFrame(columns = ['name', 'play_champ', 'type', 'result', 'length', 'kill', 'death', 'assist', 'kda', 'multi', 'cs', 'ckrate', 'mmr', 'teams', 'champs'])
+        
+    game_df = pd.DataFrame(columns = ['name', 'type', 'result', 'length', 'time', 'kill', 'death', 'assist', 'kda', 'multi', 'cs', 'ckrate', 'mmr', 'myTeams', 'myChamps', 'enemyTeams', 'enemyChamps'])
     game_df['name'] = name_list
-    game_df['play_champ'] = play_champs_list
     game_df['type'] = type_list
     game_df['result'] = result_list
     game_df['length'] = length_list
+    game_df['time'] = time_list
     game_df['kill'] = kill_list
     game_df['death'] = death_list
     game_df['assist'] = assist_list
@@ -320,10 +343,14 @@ def getGameRecord(user_df) :
     game_df['cs'] = cs_list
     game_df['ckrate'] = ckrate_list
     game_df['mmr'] = mmr_list
-    game_df['teams'] = nick_list
-    game_df['champs'] = champs_all_list
+    game_df['myTeams'] = mynick_list
+    game_df['myChamps'] = mychamps_all_list
+    game_df['enemyTeams'] = oppnick_list
+    game_df['enemyChamps'] = oppchamps_all_list
+
     
     return game_df
+
 
 def main() :
     user_info = getUserInfo(10)
@@ -340,3 +367,8 @@ def main() :
 if __name__ == "__main__" :
     main()
     
+user = pd.read_csv("C:/Users/Ro_Laptop/Dropbox/Public/공부/github/LoL-Recommender/Data/crawled_data_opgg/user.csv", engine = "python")
+temp = user.iloc[10:310,]
+
+game_temp = getGameRecord(temp)
+gameRecord = pd.concat([gameRecord, game_temp])
