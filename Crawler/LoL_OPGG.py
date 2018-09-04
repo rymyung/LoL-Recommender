@@ -216,33 +216,43 @@ def getGameRecord(user_df) :
             url = 'http://www.op.gg/summoner/userName=' + names
             
             
-            driver = webdriver.Chrome('C:/Users/Ro_Laptop/Dropbox/Public/ETC/webdriver/chromedriver.exe')
+            driver = webdriver.Chrome('C:/Users/rymyu/Dropbox/Public/ETC/webdriver/chromedriver.exe')
             driver.get(url)
             
             # Click Solo Rank
             driver.find_element_by_xpath('//*[@id="SummonerLayoutContent"]/div[1]/div[2]/div/div[1]/div/ul/li[2]/a').click()
-            time.sleep(2)
+            time.sleep(1)
             
             page = 3
             while True :
                 # Scroll Down
                 driver.execute_script("window.scrollTo(0,0); window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
-                
-                # Click More
-                element = driver.find_element_by_xpath("//*[@id=\"SummonerLayoutContent\"]/div[1]/div[2]/div/div[2]/div[" + str(page) + "]/a")
-                driver.execute_script("arguments[0].click();", element)
-                time.sleep(2)
+                time.sleep(1)
                 
                 # Get Game Result
                 contents = driver.find_elements_by_class_name('GameItemWrap')
                 check = contents[-1].text.split('\n')
                 
-                page += 1
                 if check[1] == "4달 전" :
                     break
                 
+                # Click More
+                element = driver.find_element_by_xpath("//*[@id=\"SummonerLayoutContent\"]/div[1]/div[2]/div/div[2]/div[" + str(page) + "]/a")
+                driver.execute_script("arguments[0].click();", element)
+                time.sleep(1)
+                
+                # Check finished
+                is_finished = driver.find_elements_by_class_name('ErrorMessage')
+                
+                if len(is_finished) == 2 :
+                    break
+                else :
+                    page += 1
+                
             html_source = driver.page_source
+            
+            driver.close()
+            time.sleep(1)
             
             parser = BeautifulSoup(html_source, "html.parser")
             games = parser.find_all('div', attrs = {'class' : 'GameItemWrap'})
@@ -321,9 +331,10 @@ def getGameRecord(user_df) :
                 oppchamps_all_list.append(oppchamps_list)
                 
         except : 
+            print("{} is error".format(names))
+            driver.close()
             continue
     
-            driver.close()
         
         if (j+1) % 10 == 0 :
             print("{} of {} are done.".format((j+1), len(user_df)))
@@ -367,8 +378,12 @@ def main() :
 if __name__ == "__main__" :
     main()
     
-user = pd.read_csv("C:/Users/Ro_Laptop/Dropbox/Public/공부/github/LoL-Recommender/Data/crawled_data_opgg/user.csv", engine = "python")
-temp = user.iloc[10:310,]
+user = pd.read_csv("C:/Users/rymyu/Dropbox/Public/github/LoL-Recommender/Data/crawled_data_opgg/user_new.csv", engine = "python")
+temp = user.iloc[:100,]
 
-game_temp = getGameRecord(temp)
-gameRecord = pd.concat([gameRecord, game_temp])
+game_temp2 = getGameRecord(temp)
+
+
+'''
+TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
+'''

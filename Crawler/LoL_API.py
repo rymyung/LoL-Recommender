@@ -38,7 +38,7 @@ account_list = []
 k = 1
 
 time.sleep(600)
-for name in name_list[500:600] :
+for name in name_list[800:] :
     
     while True :
         account_url = 'https://kr.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + name.replace(' ', '%20') + '?api_key=' + api_key
@@ -60,9 +60,9 @@ for name in name_list[500:600] :
     
 user = pd.DataFrame(columns = ['accountId', 'summonerName'])
 user['accountId'] = account_list
-user['summonerName'] = name_list
+user['summonerName'] = name_list[0:828]
 user_new = user.loc[user['accountId'] != 'error',]
-user_new.to_csv('user_master.csv', index = False, encoding = 'cp949')
+user.to_csv('user2.csv', index = False, encoding = 'cp949')
 
 
 # Get Game Id

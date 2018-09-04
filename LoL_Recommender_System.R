@@ -10,7 +10,7 @@
 #####################################################################################
 
 # Set working directory
-setwd("C:/Users/Ro_Laptop/Dropbox/Public/????/github/LoL-Recommender")
+setwd("C:/Users/rymyu/Dropbox/Public/github/LoL-Recommender")
 
 # Load libraries
 pkgs <- c("dplyr", "tidyr", "stringr", "igraph", 'visNetwork', 
@@ -26,13 +26,13 @@ options(warn = -1)
 #####################################################################################
 
 # Load user data
-user <- read.csv("Data/crawled_data/user_position.csv", stringsAsFactors = F)
+user <- read.csv("Data/crawled_data_api/user_position.csv", stringsAsFactors = F)
 
 # Load champ data
-champ <- read.csv("Data/crawled_data/champ.csv", stringsAsFactors = F)
+champ <- read.csv("Data/crawled_data_api/champ.csv", stringsAsFactors = F)
 
 # Load user's most champ data
-most <- read.csv("Data/crawled_data/most7.csv", stringsAsFactors = F)
+most <- read.csv("Data/crawled_data_api/most7.csv", stringsAsFactors = F)
 
 # Load user same side synergy data
 user_mt <- read.csv("Data/user_edges/user_match.csv", stringsAsFactors = F)
@@ -51,7 +51,8 @@ champ_adc <- read.csv('Data/champ_position_edges/champ_adc_relative.csv', string
 champ_support <- read.csv('Data/champ_position_edges/champ_support_relative.csv', stringsAsFactors = F)
 
 # Load game record data
-game  <- read.csv("Data/crawled_data/win_data.csv", stringsAsFactors = F) ; head(game)
+game  <- read.csv("Data/crawled_data_api/win_data.csv", stringsAsFactors = F) %>%
+  mutate(result = ifelse(result == "Win", 1, 0)); head(game)
 
 
 #####################################################################################
@@ -906,6 +907,10 @@ final_pick <- my_team_pick %>%
   left_join(champ %>% mutate(champId = as.character(champId)) %>% 
               select(champId, champName), by = 'champId'); final_pick
 
+opp_pick <- opposite_team_pick %>%
+  left_join(champ %>% mutate(champId = as.character(champId)) %>% 
+              select(champId, champName), by = 'champId'); opp_pick
+
 
 #####################################################################################
 ### Recommender System Performance
@@ -1165,6 +1170,186 @@ ggplot(all_df, aes(performance, color = model, fill = model)) +
 
 
 #####################################################################################
-### TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
+### Recommender System Performance
 #####################################################################################
 
+
+performance_df <- data.frame()
+while (T) {
+  # Select user who get recommended randomly
+  target <- user_mt_nodes[sample(1:nrow(user_mt_nodes), 1),]
+  
+  # Let's get it
+  recommended <- recommend_user(target)
+  
+  
+  # Select one of recommended users randomly
+  k <- sample(1:5, 1)
+  
+  # Select my team 
+  my_team <- t(recommended[k,-5]) %>% data.frame() %>%
+    rename(accountId = paste0("X", k)) %>% 
+    mutate(accountId = as.character(accountId)) %>%
+    bind_rows(data.frame(accountId = as.character(target$name), 
+                         row.names = target$position, 
+                         stringsAsFactors = F)) %>% 
+    left_join(user %>% mutate(accountId = as.character(accountId)), by = "accountId")
+  
+  
+  # Select opposite team randomly
+  position <- c("top", "jungle", "middle", "adc", "support")
+  opposite_team <- sapply(position, function(x) {
+    position_df <- user %>% filter(position == x);
+    choose <- sample(1:nrow(position_df), 1);
+    selected_df <- position_df %>% slice(choose)
+  }) %>% t() %>% unlist() %>% matrix(nrow=5, ncol=3) %>%
+    data.frame(row.names = position, stringsAsFactors = F) %>% 
+    rename(accountId = X1, 
+           summonerName = X2,
+           position = X3)
+  opposite_team <- opposite_team[sample(position, 5),]
+  
+  
+  # Create empty data frame for final picked champs
+  my_team_pick <- data.frame(champId = c("", "", "", "", ""), 
+                             accountId = c("", "", "", "", ""), 
+                             row.names = position, 
+                             stringsAsFactors = F)
+  
+  opposite_team_pick <- data.frame(champId = c("", "", "", "", ""), 
+                                   accountId = c("", "", "", "", ""), 
+                                   row.names = position, 
+                                   stringsAsFactors = F)
+  
+  my_num <- 1 # For my team pick
+  opp_num <- 1 # For opposite team pick
+  picked_champ <- c() # Prevent duplicated pick
+  
+  # My first pick
+  temp_df <- my_pick(my_num)
+  my_team_pick[rownames(temp_df),] <- temp_df; my_team_pick
+  
+  picked_champ <- c(picked_champ, unique(temp_df$champId))
+  my_num <- my_num + 1
+  
+  # Opposite first and second pick
+  for (i in 1:2) {
+    temp_opp_df <- opp_random_pick(opp_num, picked_champ)
+    opposite_team_pick[rownames(temp_opp_df),] <- temp_opp_df
+    picked_champ <- c(picked_champ, unique(temp_opp_df$champId))
+    opp_num <- opp_num + 1
+  }; opposite_team_pick
+  
+  # My second and third pick
+  for (i in 1:2) {
+    temp_my_df <- my_pick(my_num); temp_my_df
+    my_team_pick[rownames(temp_my_df),] <- temp_my_df
+    picked_champ <- c(picked_champ, unique(temp_my_df$champId))
+    my_num <- my_num + 1
+  }; my_team_pick
+  
+  # Opposite third and fourth pick
+  for (i in 1:2) {
+    temp_opp_df <- opp_random_pick(opp_num, picked_champ)
+    opposite_team_pick[rownames(temp_opp_df),] <- temp_opp_df
+    picked_champ <- c(picked_champ, unique(temp_opp_df$champId))
+    opp_num <- opp_num + 1
+  }
+  
+  # My fourth and fifth pick
+  for (i in 1:2) {
+    temp_my_df <- my_pick(my_num); temp_my_df
+    my_team_pick[rownames(temp_my_df),] <- temp_my_df
+    picked_champ <- c(picked_champ, unique(temp_my_df$champId))
+    my_num <- my_num + 1
+  }
+  
+  # Opposite fifth pick
+  temp_opp_df <- opp_random_pick(opp_num, picked_champ)
+  opposite_team_pick[rownames(temp_opp_df),] <- temp_opp_df
+  picked_champ <- c(picked_champ, unique(temp_opp_df$champId))
+  opp_num <- opp_num + 1
+  
+  
+  # Recommender result
+  final_pick <- my_team_pick %>% 
+    left_join(champ %>% mutate(champId = as.character(champId)) %>% 
+                select(champId, champName), by = 'champId')
+  
+  opp_pick <- opposite_team_pick %>%
+    left_join(champ %>% mutate(champId = as.character(champId)) %>% 
+                select(champId, champName), by = 'champId')
+  
+  # Random Pick
+  random_pick <- c()
+  random_pick <- append(test,sample(champ$champName[champ$position1=='top'],1))
+  random_pick <- append(test,sample(champ$champName[champ$position1=='middle'],1))
+  random_pick <- append(test,sample(champ$champName[champ$position1=='jungle'],1))
+  random_pick <- append(test,sample(champ$champName[champ$position1=='adc'],1))
+  random_pick <- append(test,sample(champ$champName[champ$position1=='support'],1))
+  
+  # Performance Check
+  my_sum <- apply(game %>% select(-result), 1, function(x) {x %in% final_pick$champName %>% sum()})
+  
+  if (length(unique(my_sum)) >= 5) {
+    my_win <- sapply(3:5, function(x) {mean(game[which(my_sum == x),]$result)})
+    
+    opp_sum <- apply(game %>% select(-result), 1, function(x) {x %in% opp_pick$champName %>% sum()})
+    opp_win <- sapply(3:5, function(x) {mean(game[which(opp_sum == x),]$result)})
+    
+    random_sum <- apply(game %>% select(-result), 1, function(x) {x %in% random_pick %>% sum()})
+    random_win <- sapply(3:5, function(x) {mean(game[which(random_sum == x),]$result)})
+    
+    performance_df <- performance_df %>%
+      bind_rows(matrix(my_win, ncol = 3) %>% data.frame() %>% mutate(team = "my")) %>%
+      bind_rows(matrix(opp_win, ncol = 3) %>% data.frame() %>% mutate(team = "opp")) %>%
+      bind_rows(matrix(random_win, ncol = 3) %>% data.frame() %>% mutate(team = "random"))
+    
+    
+    if ((nrow(performance_df)/3) %% 10 == 0) {
+      print(paste(nrow(performance_df)/3, "of", 100, "is done."))
+    }
+  } else {
+    next
+  }
+  
+  if (nrow(performance_df)/3 > 100) {
+    break
+  }
+}
+
+performance_df[is.na(performance_df)] <- 0
+my_result <- (performance_df %>% filter(team == "my") %>% select(-team) %>% as.matrix()) %*% matrix(c(0.2, 0.3, 0.5), nrow = 3)
+opp_result <- (performance_df %>% filter(team == "opp") %>% select(-team) %>% as.matrix()) %*% matrix(c(0.2, 0.3, 0.5), nrow = 3)
+random_result <- (performance_df %>% filter(team == "random") %>% select(-team) %>% as.matrix()) %*% matrix(c(0.2, 0.3, 0.5), nrow = 3)
+
+result_all <- data.frame(my_result) %>%
+  bind_cols(data.frame(opp_result)) %>%
+  bind_cols(data.frame(random_result)) %>%
+  rename(recommend = my_result,
+         opposite = opp_result,
+         random = random_result); result_all
+
+result_all %>%
+  gather(key = "method", value = "performance") %>%
+  mutate(method = factor(method, levels = c("random", "opposite", "recommend"))) %>%
+  group_by(method) %>% summarize(mean_performance = mean(performance)) %>%
+  ggplot(aes(method, mean_performance, fill = method)) + geom_bar(stat = "identity") +
+  scale_fill_manual(name = "Method", 
+                    values = brewer.pal(5, name = "Spectral")[c(1,4,5)],
+                    labels = c("Random Pick", "Opposite Pick", "Recommend Pick")) + theme_bw()
+  
+result_all %>%
+  gather(key = "method", value = "performance") %>%
+  mutate(method = factor(method, levels = c("random", "opposite", "recommend"))) %>%
+  ggplot(aes(method, performance, fill = method)) + geom_boxplot() +
+  scale_fill_manual(name = "Method", 
+                    values = brewer.pal(5, name = "Spectral")[c(1,4,5)],
+                    labels = c("Random Pick", "Opposite Pick", "Recommend Pick")) + theme_bw()
+
+result_all %>%
+  gather(key = "method", value = "performance") %>%
+  ggplot(aes(performance, fill = method, group = method)) + geom_density(alpha = 0.7) +
+  scale_fill_manual(name = "Method", 
+                    values = brewer.pal(5, name = "Spectral")[c(1,4,5)],
+                    labels = c("Random Pick", "Opposite Pick", "Recommend Pick")) + theme_bw()
