@@ -9,6 +9,9 @@
 ### Setting up Environment
 #####################################################################################
 
+# Set working directory
+setwd("C:/Users/Ro_Laptop/Dropbox/Public/github/LoL-Recommender/Data")
+
 # Load libraries
 pkgs <- c("dplyr", "tidyr", "stringr", "igraph", 'visNetwork', "colorspace", "DescTools")
 sapply(pkgs, require, character.only = T)
@@ -20,13 +23,13 @@ options(warn = -1)
 #####################################################################################
 
 # Load user data
-user <- read.csv("crawled_data/user_position.csv", stringsAsFactors = F)
+user <- read.csv("crawled_data_api/user_position.csv", stringsAsFactors = F)
 
 # Load champ data
-champ <- read.csv("crawled_data/champ.csv", stringsAsFactors = F)
+champ <- read.csv("crawled_data_api/champ.csv", stringsAsFactors = F)
 
 # Load user's most champ data
-most <- read.csv("crawled_data/most7.csv", stringsAsFactors = F)
+most <- read.csv("crawled_data_api/most7.csv", stringsAsFactors = F)
 
 # Load ally data
 user_mt <- read.csv("user_edges/user_match.csv", stringsAsFactors = F)
@@ -156,11 +159,10 @@ drawing_network <- function(node, edge, threshold, p = T, d = F) {
   return(p) 
 }
 
-# Calculate shortest path in the graph
 calculate_path <- function(graph) {
   dist <- data.frame()
   for (node in V(graph)$name) {
-    path_result <- shortest_paths(graph, from = node, to = V(graph))
+    path_result <- shortest_paths(graph, from = node, to = V(graph), weight = 1/E(graph)$weight)
     path_list <- sapply(path_result$vpath, function(x) {len <- length(x); ifelse(len==0, 0, len-1)})
     dist <- dist %>% bind_rows(data.frame(node = c(node, path_list)) %>% t() %>% data.frame())
   };
@@ -302,75 +304,7 @@ target <- user_mt_nodes[sample(1:nrow(user_mt_nodes), 1),]; target
 # Let's get it
 recommended <- recommend_user(target); recommended
 
-recommend_user <- function(target_user) {
-  
-  # Calculate user score
-  target_path <- data.frame(accountId = rownames(user_path),
-                            user_score = user_path[,paste0("X",target$name)], 
-                            stringsAsFactors = F) %>%
-    left_join(user %>% mutate(accountId = as.character(accountId)), by = "accountId") %>%
-    filter(accountId != target$name & !is.na(position)) %>%
-    arrange(user_score) %>% select(accountId, summonerName, position, user_score); head(target_path, 20)
-  
-  
-  # Calculate champ score
-  target_path$champ_score <- 0
-  for (i in 1:nrow(target_path)) {
-    target_path$champ_score[i] <- champ_synergy(target$name, target_path$accountId[i])
-  }
-  
-  # Calculate final score
-  target_path <- target_path %>% mutate(score = user_score + champ_score)
-  
-  # Select top 3 users in each position by score
-  top_candidate <- target_path %>% filter(position == "top") %>% 
-    arrange(score) %>% slice(1:3); top_candidate
-  jungle_candidate <- target_path %>% filter(position == "jungle") %>% 
-    arrange(score) %>% slice(1:3); jungle_candidate
-  middle_candidate <- target_path %>% filter(position == "middle") %>% 
-    arrange(score) %>% slice(1:3); middle_candidate
-  adc_candidate <- target_path %>% filter(position == "adc") %>% 
-    arrange(score) %>% slice(1:3); adc_candidate
-  support_candidate <- target_path %>% filter(position == "support") %>% 
-    arrange(score) %>% slice(1:3); support_candidate
-  
-  position_list <- c("top", "jungle", "middle", "adc", "support")
-  final_candidate <- top_candidate %>% bind_rows(jungle_candidate) %>% 
-    bind_rows(middle_candidate) %>% bind_rows(adc_candidate) %>% bind_rows(support_candidate) %>%
-    filter(position %in% position_list[-which(position_list==target$position)]); final_candidate
-  
-  # Get possible combinations
-  candidate_comb <- CombSet(final_candidate$summonerName, 4, repl=FALSE, ord=FALSE) %>% data.frame()
-  
-  candidate_comb_reduced <- candidate_comb %>% 
-    left_join(final_candidate %>% select(summonerName, position, score), by = c("X1" = "summonerName")) %>%
-    rename(position1 = position, score1 = score) %>% 
-    left_join(final_candidate %>% select(summonerName, position, score), by = c("X2" = "summonerName")) %>%
-    rename(position2 = position, score2 = score) %>% 
-    left_join(final_candidate %>% select(summonerName, position, score), by = c("X3" = "summonerName")) %>%
-    rename(position3 = position, score3 = score) %>% 
-    left_join(final_candidate %>% select(summonerName, position, score), by = c("X4" = "summonerName")) %>%
-    rename(position4 = position, score4 = score)
-  
-  # filter posible combinations
-  candidate_comb_reduced$count <- candidate_comb_reduced %>% 
-    select(position1, position2, position3, position4) %>% 
-    apply(1, function(x) {unique(x) %>% length()})
-  
-  final_comb <- candidate_comb_reduced %>% filter(count == 4) %>%
-    mutate(comb_score = score1 + score2 + score3 + score4) %>%
-    select(X1, X2, X3, X4, comb_score)  %>%
-    #select(position1, X1, position2, X2, position3, X3, position4, X4, comb_score) %>% 
-    arrange(comb_score) %>% slice(1:5); final_comb
-  
-  names(final_comb) <- c(position_list[-which(position_list==target$position)], "final_score")
-  
-  return(final_comb)
-}
 
-
-     
-     
 #####################################################################################
 ### TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
 #####################################################################################

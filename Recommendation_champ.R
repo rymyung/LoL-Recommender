@@ -9,6 +9,9 @@
 ### Setting up Environment
 #####################################################################################
 
+# Set working directory
+setwd("C:/Users/Ro_Laptop/Dropbox/Public/github/LoL-Recommender/Data")
+
 # Load libraries
 pkgs <- c("dplyr", "tidyr", "stringr", "igraph", 'visNetwork', "colorspace")
 sapply(pkgs, require, character.only = T)
@@ -19,14 +22,14 @@ sapply(pkgs, require, character.only = T)
 #####################################################################################
 
 # Load user data
-user <- read.csv("crawled_data/user_position.csv", stringsAsFactors = F)
+user <- read.csv("crawled_data_api/user_position.csv", stringsAsFactors = F)
 
 # Load champ data
-champ <- read.csv("crawled_data/champ.csv", stringsAsFactors = F) %>%
+champ <- read.csv("crawled_data_api/champ.csv", stringsAsFactors = F) %>%
   mutate(champId = as.character(champId))
 
 # Load user's most champ data
-most <- read.csv("crawled_data/most7.csv", stringsAsFactors = F)
+most <- read.csv("crawled_data_api/most7.csv", stringsAsFactors = F)
 
 # Load champ same side synergy data
 champ_mt <- read.csv("champ_edges/champ_match.csv", stringsAsFactors = F)
@@ -205,11 +208,11 @@ my_pick <- function(my_num) {
 calculate_path <- function(graph) {
   dist <- data.frame()
   for (node in V(graph)$name) {
-    path_result <- shortest_paths(graph, from = node, to = V(graph))
+    path_result <- shortest_paths(graph, from = node, to = V(graph), weight = 1/E(graph)$weight)
     path_list <- sapply(path_result$vpath, function(x) {len <- length(x); ifelse(len==0, 0, len-1)})
-    dist <- dist %>% bind_rows(data.frame(temp = c(node, path_list)) %>% t() %>% data.frame())
+    dist <- dist %>% bind_rows(data.frame(node = c(node, path_list)) %>% t() %>% data.frame())
   };
-  names(dist) <- c('name',paste0("X", V(graph)$name))
+  names(dist) <- c('name',paste0("X",V(graph)$name))
   rownames(dist) <- dist$name
   dist <- dist[,-1]
   
