@@ -26,7 +26,7 @@ champ <- read.csv("crawled_data/champ.csv", stringsAsFactors = F)
 ### Getting Edges for Users
 #####################################################################################
 
-# Make user - usr matrix for edges
+# Make user - user matrix for edges
 df <- table(unique(user$accountId), unique(user$accountId)) %>% data.frame() %>%
   spread(Var2, Freq)
 row.names(df) <- df$Var1
