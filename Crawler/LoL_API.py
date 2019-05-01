@@ -10,7 +10,7 @@ import time
 import pandas as pd
 
 # Set API Key
-api_key = 'RGAPI-4806a25d-e22d-4d15-ab9d-9156c9984c7a' # Need to chage everyday
+api_key = '' # Need to change everyday
 
 # Get Summoner's Names
 challenger_url = "https://kr.api.riotgames.com/lol/league/v3/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=" + api_key
@@ -21,13 +21,13 @@ challenger_data = json.loads(challenger_r.text)
 name_list = []
 for entry in challenger_data['entries'] :
     name_list.append(entry['playerOrTeamName'])
-    
+
 master_url = "https://kr.api.riotgames.com/lol/league/v3/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=" + api_key
 master_r = requests.get(master_url)
 master_data = json.loads(master_r.text)
 
 for entry in master_data['entries'] :
-    name_list.append(entry['playerOrTeamName'])   
+    name_list.append(entry['playerOrTeamName'])
 
 
 # Get Account Id
@@ -39,25 +39,25 @@ k = 1
 
 time.sleep(600)
 for name in name_list[800:] :
-    
+
     while True :
         account_url = 'https://kr.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + name.replace(' ', '%20') + '?api_key=' + api_key
         account_r = requests.get(account_url)
         account_data = json.loads(account_r.text)
-        
+
         try :
             account_list.append(account_data['accountId'])
             break
-        
+
         except :
             print("error")
             time.sleep(60)
-            
+
     if k % 10 == 0 :
         print('{} of {} is done.'.format(k, len(name_list)))
-        
+
     k += 1
-    
+
 user = pd.DataFrame(columns = ['accountId', 'summonerName'])
 user['accountId'] = account_list
 user['summonerName'] = name_list[0:828]
@@ -79,7 +79,7 @@ for i in range(len(user)) :
     match1_url = 'https://kr.api.riotgames.com/lol/match/v3/matchlists/by-account/' + str(accountId) + '?api_key=' + api_key
     match1_r = requests.get(match1_url)
     match1_data = json.loads(match1_r.text)
-    
+
     try :
         for match in match1_data['matches'] :
             account_list2.append(accountId)
@@ -90,10 +90,10 @@ for i in range(len(user)) :
         game_list.append('error')
         k+=1
         print('{} error'.format(k))
-    
+
     if (i+1) % 20 == 0 :
         time.sleep(1)
-    
+
     if (i+1) % 100 == 0 :
         print('{} of {} is done.'.format(i+1, len(user)))
         time.sleep(120)
@@ -106,7 +106,7 @@ play_temp = play_temp.loc[play_temp['gameId']!='error',]
 play_temp.to_csv('play_temp_master.csv', encoding = 'cp949')
 
 
-# Game 
+# Game
 '''
 500 requests / 10 seconds
 '''
@@ -140,8 +140,8 @@ for gameId in game_list :
     game = 'https://kr.api.riotgames.com/lol/match/v3/matches/' + str(gameId) + '?api_key=' + api_key
     game_r = requests.get(game)
     game_data = json.loads(game_r.text)
-    
-    
+
+
     for i in range(10) :
         try :
             gameId_list2.append(gameId)
@@ -152,11 +152,11 @@ for gameId in game_list :
             version_list.append(game_data['gameVersion']) # Game Version
             mode_list.append(game_data['gameMode']) # gameMode == CLASSIC : Classic Summoner's Rift and Twisted Treeline Games
             type_list.append(game_data['gameType']) # gameType == MATCHED_GAME : All games except custom & tutorial games
-    
-            
+
+
             accountId = game_data['participantIdentities'][i]['player']['accountId']
             participantId = game_data['participantIdentities'][i]['participantId']
-            
+
             accountId_list3.append(accountId)
             team_list.append(game_data['participants'][participantId-1]['teamId'])
             champId_list.append(game_data['participants'][participantId-1]['championId'])
@@ -172,7 +172,7 @@ for gameId in game_list :
                 result_list.append('Lose')
             else :
                 result_list.append('Others')
-        
+
         except :
             try :
                 time.sleep(120)
@@ -184,11 +184,11 @@ for gameId in game_list :
                 version_list.append(game_data['gameVersion']) # Game Version
                 mode_list.append(game_data['gameMode']) # gameMode == CLASSIC : Classic Summoner's Rift and Twisted Treeline Games
                 type_list.append(game_data['gameType']) # gameType == MATCHED_GAME : All games except custom & tutorial games
-        
-                
+
+
                 accountId = game_data['participantIdentities'][i]['player']['accountId']
                 participantId = game_data['participantIdentities'][i]['participantId']
-                
+
                 accountId_list3.append(accountId)
                 team_list.append(game_data['participants'][participantId-1]['teamId'])
                 champId_list.append(game_data['participants'][participantId-1]['championId'])
@@ -204,7 +204,7 @@ for gameId in game_list :
                     result_list.append('Lose')
                 else :
                     result_list.append('Others')
-                    
+
             except :
                 gameId_list2.append(gameId)
                 gameLength_list.append('error')
@@ -214,7 +214,7 @@ for gameId in game_list :
                 version_list.append('error')
                 mode_list.append('error')
                 type_list.append('error')
-                
+
                 accountId_list3.append('error')
                 champId_list.append('error')
                 team_list.append('error')
@@ -225,16 +225,16 @@ for gameId in game_list :
                 damaged_list.append('error')
                 cs_list.append('error')
                 result_list.append('error')
-                
+
                 print('{} errors'.format(k))
                 k += 1
-            
+
     if k > 200 :
         break
-   
+
     if g % 20 == 0 :
         time.sleep(1)
-       
+
     if g % 100 == 0 :
         print('{} of {} is done.'.format(str(g), len(game_list)))
         time.sleep(120)
@@ -278,7 +278,7 @@ champName_list = []
 for value in champ_dic['data'].values() :
     champId_list2.append(value['id'])
     champName_list.append(value['name'])
-   
+
 champ = pd.DataFrame(columns = ['champId', 'champName'])
 champ['champId'] = champId_list2
 champ['champName'] = champName_list
@@ -301,7 +301,7 @@ for i in range(10) :
     gameId = play.loc[i, 'gameId']
     champId = play.loc[i, 'champId']
     k = False
-    
+
     url = 'https://kr.api.riotgames.com/lol/match/v3/matchlists/by-account/'+ str(accountId) + '?champion=' + str(champId) + '&api_key=' + api_key
     r = requests.get(url)
     data = json.loads(r.text)
@@ -311,7 +311,7 @@ for i in range(10) :
             k = True
             lane_list.append(match['lane'])
             break
-        
+
         if k == False :
             lane_list.append('error')
 
